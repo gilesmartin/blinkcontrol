@@ -1,0 +1,56 @@
+#!/bin/bash
+
+email=$(sed -n '1p' ~/.blinkcontrol/blinkcredentials)
+password=$(sed -n '2p' ~/.blinkcontrol/blinkcredentials)
+authcode=$(cat ~/.blinkcontrol/blinkauthcode)
+
+#test to make sure current authcode is still valid. If not get a new one.
+
+currentauthtest=$(curl -s -H "Host: prod.immedcat ia-semi.com" -H "TOKEN_AUTH: $authcode" --compressed https://prod.immedia-semi.com/homescreen | grep -o '\"message\":\".\{0,12\}' | cut -c12-)
+if [ "$currentauthtest" == "Unauthorized" ]
+then 
+curl -s -H "Host: prod.immedia-semi.com" -H "Content-Type: application/json" --data-binary '{ "password" : "'"${password}"'", "client_specifier" : "iPhone 9.2 | 2.2 | 222", "email" : "'"${email}"'" }' --compressed https://prod.immedia-semi.com/login | grep -o '\"authtoken\":\".\{0,22\}' | cut -c14-  > ~/.blinkcontrol/blinkauthcode
+authcode=$(cat ~/.blinkcontrol/blinkauthcode)
+if [ "$authcode" == "" ]
+then
+echo "No Authcode received, please check credentials"
+exit
+fi
+fi
+
+#get camera network ID
+
+network=$(curl -s -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $authcode" --compressed https://prod.immedia-semi.com/networks | grep -o '\"summary\":{\".\{0,4\}' | cut -c13-)
+
+#if checking status return current status and quit
+if [ "$1" == "status" ]
+then
+curl -s -H "Host: prod.immedcat ia-semi.com" -H "TOKEN_AUTH: $authcode" --compressed https://prod.immedia-semi.com/homescreen | grep  -oh armed\":"\w*" | cut -c8- | head -1
+exit
+else
+
+#if arming cameras arm and quit
+if [ "$1" == "arm" ]
+then
+curl -s -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $authcode" --data-binary "" --compressed https://prod.immedia-semi.com/network/$network/arm &> /dev/null
+echo "cameras armed: "
+curl -s -H "Host: prod.immedcat ia-semi.com" -H "TOKEN_AUTH: $authcode" --compressed https://prod.immedia-semi.com/homescreen | grep  -oh armed\":"\w*" | cut -c8- | head -1
+exit
+else
+
+#if disarming cameras disarm and quit
+if [ "$1" == "disarm" ]
+then
+curl -s -H "Host: prod.immedia-semi.com" -H "TOKEN_AUTH: $authcode" --data-binary "" --compressed https://prod.immedia-semi.com/network/$network/disarm &> /dev/null
+echo "cameras armed: " 
+curl -s -H "Host: prod.immedcat ia-semi.com" -H "TOKEN_AUTH: $authcode" --compressed https://prod.immedia-semi.com/homescreen | grep  -oh armed\":"\w*" | cut -c8- | head -1
+exit
+else
+
+#give user options then quit
+echo you did not specify an option. please specify status, arm, or disarm
+
+fi
+fi
+fi
+

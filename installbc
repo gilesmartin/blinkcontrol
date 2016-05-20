@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#make blinkcontrol directory
+
+mkdir ~/.blinkcontrol
+
+#copy blinkcontrol files
+
+cp blinkcontrol /usr/local/bin/
+cp bcsetup /usr/local/bin/
+
+#make things executible
+
+chmod +x /usr/local/bin/blinkcontrol
+chmod +x /usr/local/bin/bcsetup
+
+#run initial setup
+
+bcsetup

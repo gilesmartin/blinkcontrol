@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#prompt for email
+
+echo Please enter your email address
+
+read email
+
+echo $email > ~/.blinkcontrol/blinkcredentials
+
+echo Please enter your blink password
+
+read password
+
+echo $password >> ~/.blinkcontrol/blinkcredentials
+
+blinkcontrol status
