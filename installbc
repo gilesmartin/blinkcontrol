@@ -1,9 +1,5 @@
 #!/bin/bash
 
-#make blinkcontrol directory
-
-mkdir ~/.blinkcontrol
-
 #copy blinkcontrol files
 
 cp blinkcontrol /usr/local/bin/
@@ -14,6 +10,5 @@ cp bcsetup /usr/local/bin/
 chmod +x /usr/local/bin/blinkcontrol
 chmod +x /usr/local/bin/bcsetup
 
-#run initial setup
-
-bcsetup
+echo
+echo "Install complete type 'bcsetup' to begin"

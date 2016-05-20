@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#check if directory exists. create if it does not
+
+if [ ! -d ~/.blinkcontrol ]
+then
+mkdir ~/.blinkcontrol
+echo null > ~/.blinkcontrol/blinkauthcode
+fi
+
 #prompt for email
 
 echo Please enter your email address
@@ -14,4 +22,6 @@ read password
 
 echo $password >> ~/.blinkcontrol/blinkcredentials
 
+echo
+echo "Cameras Armed:"
 blinkcontrol status
